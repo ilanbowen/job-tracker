@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-heading company-detail-heading">
+  <div class="detail-title-block">
+    <div class="company-title-row">
+      {% if company.logo_filename %}
+        <img class="company-logo detail-logo" src="/logos/{{ company.logo_filename }}" alt="{{ company.name }} logo">
+      {% else %}
+        <span class="company-logo detail-logo logo-placeholder">{{ company.name[:1] }}</span>
+      {% endif %}
+      <div>
+        <h1 class="detail-company-title">{{ company.name }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/companies">Back</a>
+    <a class="button secondary" href="/companies/{{ company.id }}/edit">Edit</a>
+    <form method="post" action="/companies/{{ company.id }}/delete" onsubmit="return confirm('Delete this company?');">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <div class="card">
+    <h2>Company details</h2>
+    <table class="detail-table summary-table">
+      <colgroup><col class="detail-label-col"><col class="detail-value-col"></colgroup>
+      <tbody>
+        <tr><th scope="row">City</th><td>{{ company.city or '-' }}</td></tr>
+        <tr><th scope="row">Address</th><td class="prewrap">{{ company.address or '-' }}</td></tr>
+        <tr><th scope="row">Website</th><td class="url-cell">{% if company.website %}<a class="url-link" href="{{ company.website }}" target="_blank" rel="noopener" title="{{ company.website }}">{{ company.website }}</a>{% else %}-{% endif %}</td></tr>
+        <tr><th scope="row">LinkedIn</th><td class="url-cell">{% if company.linkedin_url %}<a class="url-link" href="{{ company.linkedin_url }}" target="_blank" rel="noopener" title="{{ company.linkedin_url }}">{{ company.linkedin_url }}</a>{% else %}-{% endif %}</td></tr>
+        <tr><th scope="row">Date added</th><td>{{ company.created_at|datetime_short }}</td></tr>
+        <tr><th scope="row">Last modified</th><td>{{ company.updated_at|datetime_short }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Notes</h2>
+  <p class="prewrap">{{ company.notes or 'No notes saved.' }}</p>
+</section>
+{% endblock %}

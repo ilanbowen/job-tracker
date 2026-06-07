@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-app-data
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.app.storage.size }}

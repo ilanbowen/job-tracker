@@ -1,0 +1,15 @@
+{{- if .Values.backup.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-backups
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.backup.storage.size | quote }}
+{{- end }}

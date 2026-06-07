@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Maintenance</h1>
+    <p>Manage shared records and lookup values used by the job application pipeline.</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/applications/intake">Back to applications</a>
+  </div>
+</section>
+
+<section class="maintenance-grid">
+  <a class="maintenance-card" href="/companies">
+    <strong>Companies</strong>
+    <span>Manage employer records, websites, addresses, cities, and logos.</span>
+  </a>
+  <a class="maintenance-card" href="/contacts">
+    <strong>Company Contacts</strong>
+    <span>Manage contacts at companies and link them to job applications.</span>
+  </a>
+  <a class="maintenance-card" href="/recruiter-companies">
+    <strong>Recruiter Companies</strong>
+    <span>Manage recruiting agencies and their logos.</span>
+  </a>
+  <a class="maintenance-card" href="/recruiter-contacts">
+    <strong>Recruiter Contacts</strong>
+    <span>Manage recruiter contacts independently from job applications.</span>
+  </a>
+  <a class="maintenance-card" href="/maintenance/statuses">
+    <strong>Job Application Statuses</strong>
+    <span>Add, rename, delete, reorder, and assign status values to application summary screens.</span>
+  </a>
+</section>
+{% endblock %}

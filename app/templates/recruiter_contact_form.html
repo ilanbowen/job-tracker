@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Recruiter contacts are maintained separately and are not linked to position records yet.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="recruiter-contact-form">Save</button>
+    <a class="button secondary" href="{{ '/recruiter-contacts/' ~ recruiter_contact.id if recruiter_contact else '/recruiter-contacts' }}">Cancel</a>
+  </div>
+</section>
+
+<form id="recruiter-contact-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid two">
+    <label>Recruiter company
+      <select name="recruiter_company_id">
+        <option value="">No recruiter company selected</option>
+        {% for recruiter_company in recruiter_companies %}
+          <option value="{{ recruiter_company.id }}" {% if recruiter_contact and recruiter_contact.recruiter_company_id == recruiter_company.id %}selected{% endif %}>{{ recruiter_company.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Name
+      <input name="name" required value="{{ recruiter_contact.name if recruiter_contact else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Position
+      <input name="position" value="{{ recruiter_contact.position if recruiter_contact and recruiter_contact.position else '' }}">
+    </label>
+    <label>LinkedIn URL
+      <input name="linkedin_url" type="url" placeholder="https://www.linkedin.com/in/..." value="{{ recruiter_contact.linkedin_url if recruiter_contact and recruiter_contact.linkedin_url else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Email
+      <input name="email" type="email" value="{{ recruiter_contact.email if recruiter_contact and recruiter_contact.email else '' }}">
+    </label>
+    <label>Phone
+      <input name="phone" type="tel" value="{{ recruiter_contact.phone if recruiter_contact and recruiter_contact.phone else '' }}">
+    </label>
+  </div>
+
+  <label>Date contact made
+    <input name="date_contact_made" type="date" value="{{ recruiter_contact.date_contact_made if recruiter_contact and recruiter_contact.date_contact_made else '' }}">
+  </label>
+
+  <label>Notes
+    <textarea name="notes" rows="5">{{ recruiter_contact.notes if recruiter_contact and recruiter_contact.notes else '' }}</textarea>
+  </label>
+</form>
+{% endblock %}

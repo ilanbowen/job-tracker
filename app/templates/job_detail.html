@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-heading company-detail-heading">
+  <div class="detail-title-block">
+    <div class="company-title-row">
+      {% if application.display_company_logo_filename %}
+        <img class="company-logo detail-logo" src="/logos/{{ application.display_company_logo_filename }}" alt="{{ application.display_company_name }} logo">
+      {% else %}
+        <span class="company-logo detail-logo logo-placeholder">{{ application.display_company_name[:1] }}</span>
+      {% endif %}
+      <div>
+        <h1 class="detail-company-title">{{ application.display_company_name }}</h1>
+        <p class="detail-position-subtitle">{{ application.position_title }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/applications/{{ application.id }}/edit">Edit position</a>
+    <form method="post" action="/applications/{{ application.id }}/delete" onsubmit="return confirm('Delete this application?');">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </div>
+</section>
+
+
+<section class="call-prep-grid">
+  <div class="card focus-card">
+    <h2>Position quick reference</h2>
+    <table class="detail-table summary-table">
+      <colgroup>
+        <col class="detail-label-col">
+        <col class="detail-value-col">
+      </colgroup>
+      <tbody>
+        <tr>
+          <th scope="row">Position</th>
+          <td>{{ application.position_title }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Company website</th>
+          <td class="url-cell">
+            {% if application.display_company_website %}
+              <a class="url-link" href="{{ application.display_company_website }}" target="_blank" rel="noopener" title="{{ application.display_company_website }}">{{ application.display_company_website }}</a>
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Company LinkedIn</th>
+          <td class="url-cell">
+            {% if application.display_company_linkedin_url %}
+              <a class="url-link" href="{{ application.display_company_linkedin_url }}" target="_blank" rel="noopener" title="{{ application.display_company_linkedin_url }}">{{ application.display_company_linkedin_url }}</a>
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Job URL</th>
+          <td class="url-cell">
+            {% if application.job_url %}
+              <a class="url-link" href="{{ application.job_url }}" target="_blank" rel="noopener" title="{{ application.job_url }}">{{ application.job_url }}</a>
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card focus-card">
+    <div class="section-title-row">
+      <div>
+        <h2>Company Contacts</h2>
+        <p class="section-help">Company contacts are managed centrally and linked to this position.</p>
+      </div>
+      <a class="button secondary" href="/contacts/new">Add company contact</a>
+    </div>
+    {% if application.contacts %}
+      <table class="contacts-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Phone</th>
+            <th>LinkedIn</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for contact in application.contacts %}
+            <tr>
+              <td>
+                <strong>{{ contact.name }}</strong>
+                {% if contact.email %}<div class="contact-subtext">{{ contact.email }}</div>{% endif %}
+              </td>
+              <td>{{ contact.position or '-' }}</td>
+              <td>{{ contact.phone or '-' }}</td>
+              <td class="url-cell">
+                {% if contact.linkedin_url %}
+                  <a class="url-link" href="{{ contact.linkedin_url }}" target="_blank" rel="noopener" title="{{ contact.linkedin_url }}">LinkedIn</a>
+                {% else %}-{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No company contacts linked to this position yet. Use <strong>Edit position</strong> to choose company contacts.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="detail-grid">
+  <div class="card">
+    <h2>Application summary</h2>
+    <table class="detail-table summary-table">
+      <colgroup>
+        <col class="detail-label-col">
+        <col class="detail-value-col">
+      </colgroup>
+      <tbody>
+        <tr><th scope="row">Status</th><td><span class="pill">{{ application.status }}</span></td></tr>
+        <tr><th scope="row">Location</th><td>{{ application.display_location or '-' }}</td></tr>
+        <tr><th scope="row">Remote policy</th><td>{{ application.remote_policy or '-' }}</td></tr>
+        <tr><th scope="row">Source</th><td>{{ application.source or '-' }}</td></tr>
+        <tr><th scope="row">Date applied</th><td>{{ application.date_applied|date_short }}</td></tr>
+        <tr><th scope="row">Next action</th><td>{{ application.next_action_date|date_short }}</td></tr>
+        <tr><th scope="row">Salary</th><td>{{ application.salary_range or '-' }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Add timeline event</h2>
+    <form method="post" action="/applications/{{ application.id }}/events" class="compact-form">
+      <label>Event type
+        <select name="event_type">
+          {% for option in event_type_options %}
+            <option value="{{ option }}">{{ option }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Event date
+        <input name="event_date" type="date">
+      </label>
+      <label>Note
+        <textarea name="note" rows="4" required></textarea>
+      </label>
+      <button type="submit">Add event</button>
+    </form>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Notes</h2>
+  <p class="prewrap">{{ application.notes or 'No notes yet.' }}</p>
+</section>
+
+<section class="card">
+  <h2>Description</h2>
+  <p class="prewrap">{{ application.description or 'No description saved.' }}</p>
+</section>
+
+<section class="card">
+  <h2>Timeline</h2>
+  {% if application.events %}
+    <table class="detail-table timeline-table">
+      <colgroup>
+        <col class="timeline-date-col">
+        <col class="timeline-content-col">
+      </colgroup>
+      <tbody>
+        {% for event in application.events %}
+          <tr>
+            <th scope="row">{{ event.event_date|date_short }}</th>
+            <td>
+              <strong>{{ event.event_type }}</strong>
+              <p class="prewrap">{{ event.note }}</p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No timeline events yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

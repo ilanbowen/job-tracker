@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Recruiter Contacts</h1>
+    <p>Maintain recruiters separately from company contacts. These are not linked to positions yet.</p>
+  </div>
+  <div class="actions">
+    <a class="button" href="/recruiter-contacts/new">Add recruiter contact</a>
+  </div>
+</section>
+
+{% if recruiter_contacts %}
+  <section class="table-card compact-table-card">
+    <table class="compact-table recruiter-contacts-table">
+      <thead>
+        <tr>
+          <th>Recruiter Company</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>LinkedIn</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for recruiter_contact in recruiter_contacts %}
+          <tr>
+            <td class="nowrap truncate-cell">
+              {% if recruiter_contact.recruiter_company %}
+                <a class="record-link" href="/recruiter-companies/{{ recruiter_contact.recruiter_company.id }}">
+                  <span class="company-cell inline-company-cell">
+                    {% if recruiter_contact.recruiter_company.logo_filename %}
+                      <img class="company-logo summary-logo" src="/logos/{{ recruiter_contact.recruiter_company.logo_filename }}" alt="{{ recruiter_contact.recruiter_company.name }} logo">
+                    {% else %}
+                      <span class="company-logo summary-logo logo-placeholder">{{ recruiter_contact.recruiter_company.name[:1] }}</span>
+                    {% endif %}
+                    <strong>{{ recruiter_contact.recruiter_company.name }}</strong>
+                  </span>
+                </a>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td class="nowrap truncate-cell"><a class="record-link" href="/recruiter-contacts/{{ recruiter_contact.id }}"><strong>{{ recruiter_contact.name }}</strong></a></td>
+            <td class="nowrap truncate-cell">{{ recruiter_contact.position or '-' }}</td>
+            <td class="nowrap">{% if recruiter_contact.linkedin_url %}<a href="{{ recruiter_contact.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>{% else %}-{% endif %}</td>
+            <td class="actions-cell nowrap">
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/recruiter-contacts/{{ recruiter_contact.id }}/edit">Edit</a>
+                <form method="post" action="/recruiter-contacts/{{ recruiter_contact.id }}/delete" onsubmit="return confirm('Delete this recruiter contact?');">
+                  <button type="submit" class="danger small-button">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No recruiter contacts yet</h2>
+    <p>Add recruiters here. Later we can connect them to applications or outreach workflows.</p>
+    <a class="button" href="/recruiter-contacts/new">Add recruiter contact</a>
+  </section>
+{% endif %}
+{% endblock %}

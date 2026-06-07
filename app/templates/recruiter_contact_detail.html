@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-heading contact-detail-heading">
+  <div class="contact-heading-main">
+    <h1>{{ recruiter_contact.name }}</h1>
+    <p>{{ recruiter_contact.position or 'Recruiter contact' }}</p>
+
+    {% if recruiter_contact.recruiter_company %}
+      <div class="contact-company-line">
+        <a class="contact-company-link" href="/recruiter-companies/{{ recruiter_contact.recruiter_company.id }}">
+          {% if recruiter_contact.recruiter_company.logo_filename %}
+            <img class="company-logo contact-company-logo" src="/logos/{{ recruiter_contact.recruiter_company.logo_filename }}" alt="{{ recruiter_contact.recruiter_company.name }} logo">
+          {% else %}
+            <span class="company-logo contact-company-logo logo-placeholder">{{ recruiter_contact.recruiter_company.name[:1] }}</span>
+          {% endif %}
+          <span class="contact-company-name">{{ recruiter_contact.recruiter_company.name }}</span>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="actions">
+    <a class="button secondary" href="/recruiter-contacts">Back</a>
+    <a class="button secondary" href="/recruiter-contacts/{{ recruiter_contact.id }}/edit">Edit</a>
+    <form method="post" action="/recruiter-contacts/{{ recruiter_contact.id }}/delete" onsubmit="return confirm('Delete this recruiter contact?');">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </div>
+</section>
+
+<section class="detail-grid contact-detail-grid">
+  <div class="card">
+    <h2>Recruiter contact details</h2>
+    <table class="detail-table summary-table contact-detail-table">
+      <colgroup><col class="detail-label-col"><col class="detail-value-col"></colgroup>
+      <tbody>
+        <tr><th scope="row">Position</th><td>{{ recruiter_contact.position or '-' }}</td></tr>
+        <tr>
+          <th scope="row">Phone</th>
+          <td>
+            <div class="contact-methods-inline">
+              <span class="contact-phone-value">{{ recruiter_contact.phone or '-' }}</span>
+              {% if recruiter_contact.linkedin_url %}
+                <a class="contact-linkedin-action" href="{{ recruiter_contact.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        <tr><th scope="row">Email</th><td>{% if recruiter_contact.email %}<a href="mailto:{{ recruiter_contact.email }}">{{ recruiter_contact.email }}</a>{% else %}-{% endif %}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card metadata-card">
+    <h2>Dates</h2>
+    <div class="metadata-lines">
+      <div class="metadata-line"><span>Date added</span><strong>{{ recruiter_contact.date_added|date_short }}</strong></div>
+      <div class="metadata-line"><span>Date contact made</span><strong>{{ recruiter_contact.date_contact_made|date_short }}</strong></div>
+      <div class="metadata-line"><span>Last modified</span><strong>{{ recruiter_contact.updated_at|datetime_short }}</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Notes</h2>
+  <p class="prewrap">{{ recruiter_contact.notes or 'No notes saved.' }}</p>
+</section>
+{% endblock %}

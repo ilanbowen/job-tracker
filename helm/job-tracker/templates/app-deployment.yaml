@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-app
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      {{- include "job-tracker.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        {{- include "job-tracker.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: app
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ include "job-tracker.fullname" . }}-secret
+          command:
+            - sh
+            - -c
+            - |
+              python - <<'PY'
+              import os
+              import time
+              import psycopg2
+              from urllib.parse import urlparse
+
+              url = os.environ["DATABASE_URL"]
+              parsed = urlparse(url.replace("postgresql+psycopg2", "postgresql"))
+              for attempt in range(60):
+                  try:
+                      conn = psycopg2.connect(
+                          dbname=parsed.path.lstrip('/'),
+                          user=parsed.username,
+                          password=parsed.password,
+                          host=parsed.hostname,
+                          port=parsed.port or 5432,
+                      )
+                      conn.close()
+                      print("PostgreSQL is reachable")
+                      break
+                  except Exception as exc:
+                      print(f"Waiting for PostgreSQL... {exc}")
+                      time.sleep(2)
+              else:
+                  raise SystemExit("PostgreSQL was not reachable")
+              PY
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "job-tracker.fullname" . }}-config
+            - secretRef:
+                name: {{ include "job-tracker.fullname" . }}-secret
+          volumeMounts:
+            - name: app-data
+              mountPath: /app/data
+          command:
+            - sh
+            - -c
+            - alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port {{ .Values.app.port }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: {{ include "job-tracker.fullname" . }}-app-data

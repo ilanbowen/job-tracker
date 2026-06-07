@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+  </div>
+  <div class="actions">
+    <button type="submit" form="company-form">Save</button>
+    <a class="button secondary" href="{{ '/companies/' ~ company.id if company else '/companies' }}">Cancel</a>
+  </div>
+</section>
+
+<form id="company-form" class="form-card" method="post" action="{{ form_action }}" enctype="multipart/form-data">
+  <label>Company name
+    <input name="name" required value="{{ company.name if company else '' }}">
+  </label>
+
+  <div class="grid two">
+    <label>Company website
+      <input name="website" type="url" placeholder="https://example.com" value="{{ company.website if company and company.website else '' }}">
+    </label>
+    <label>Company LinkedIn page
+      <input name="linkedin_url" type="url" placeholder="https://www.linkedin.com/company/..." value="{{ company.linkedin_url if company and company.linkedin_url else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>City
+      <input name="city" placeholder="Tel Aviv" value="{{ company.city if company and company.city else '' }}">
+    </label>
+    <label>Upload company logo
+      <input name="logo_upload" type="file" accept=".png,.jpg,.jpeg,.gif,.webp,.svg,image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
+    </label>
+  </div>
+
+  {% if company and company.logo_filename %}
+    <div class="current-logo-card">
+      <img class="company-logo summary-logo" src="/logos/{{ company.logo_filename }}" alt="{{ company.name }} logo">
+      <span>Current logo: {{ company.logo_filename }}</span>
+      <label class="checkbox-inline">
+        <input type="checkbox" name="remove_logo" value="1">
+        Remove current logo
+      </label>
+    </div>
+  {% endif %}
+
+  <label>Company address
+    <textarea name="address" rows="3" placeholder="Street, building, floor, etc.">{{ company.address if company and company.address else '' }}</textarea>
+  </label>
+
+  <label>Notes
+    <textarea name="notes" rows="5">{{ company.notes if company and company.notes else '' }}</textarea>
+  </label>
+</form>
+{% endblock %}

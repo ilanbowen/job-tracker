@@ -1,0 +1,45 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-backup
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "job-tracker.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: {{ .Values.postgres.image | quote }}
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - secretRef:
+                    name: {{ include "job-tracker.fullname" . }}-secret
+              command:
+                - sh
+                - -c
+                - |
+                  mkdir -p /backups
+                  export PGPASSWORD="$POSTGRES_PASSWORD"
+                  pg_dump -h {{ include "job-tracker.fullname" . }}-postgres -U "$POSTGRES_USER" -d "$POSTGRES_DB" > "/backups/jobtracker-$(date +%Y%m%d-%H%M%S).sql"
+                  ls -lh /backups
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: {{ include "job-tracker.fullname" . }}-backups
+{{- end }}

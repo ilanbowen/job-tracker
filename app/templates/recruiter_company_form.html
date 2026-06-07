@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+  </div>
+  <div class="actions">
+    <button type="submit" form="recruiter-company-form">Save</button>
+    <a class="button secondary" href="{{ '/recruiter-companies/' ~ recruiter_company.id if recruiter_company else '/recruiter-companies' }}">Cancel</a>
+  </div>
+</section>
+
+<form id="recruiter-company-form" class="form-card" method="post" action="{{ form_action }}" enctype="multipart/form-data">
+  <label>Recruiter company name
+    <input name="name" required value="{{ recruiter_company.name if recruiter_company else '' }}">
+  </label>
+
+  <div class="grid two">
+    <label>Website
+      <input name="website" type="url" value="{{ recruiter_company.website if recruiter_company and recruiter_company.website else '' }}">
+    </label>
+    <label>LinkedIn page
+      <input name="linkedin_url" type="url" value="{{ recruiter_company.linkedin_url if recruiter_company and recruiter_company.linkedin_url else '' }}">
+    </label>
+  </div>
+
+  <label>Upload recruiter company logo
+    <input name="logo_upload" type="file" accept=".png,.jpg,.jpeg,.gif,.webp,.svg,image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
+  </label>
+
+  {% if recruiter_company and recruiter_company.logo_filename %}
+    <div class="current-logo-card">
+      <img class="company-logo summary-logo" src="/logos/{{ recruiter_company.logo_filename }}" alt="{{ recruiter_company.name }} logo">
+      <span>Current logo: {{ recruiter_company.logo_filename }}</span>
+      <label class="checkbox-inline">
+        <input type="checkbox" name="remove_logo" value="1">
+        Remove current logo
+      </label>
+    </div>
+  {% endif %}
+
+  <label>Notes
+    <textarea name="notes" rows="5">{{ recruiter_company.notes if recruiter_company and recruiter_company.notes else '' }}</textarea>
+  </label>
+</form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Status values are used by job application forms, filters, and summaries.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="status-form">Save</button>
+    <a class="button secondary" href="/maintenance/statuses">Cancel</a>
+  </div>
+</section>
+
+<form id="status-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid three">
+    <label>Status name
+      <input name="name" required value="{{ status_value.name if status_value else '' }}">
+    </label>
+    <label>Summary screen
+      <select name="pipeline_stage">
+        {% for stage_key, stage_label in pipeline_stage_options %}
+          <option value="{{ stage_key }}" {% if (status_value and status_value.pipeline_stage == stage_key) or (not status_value and stage_key == 'intake') %}selected{% endif %}>{{ stage_label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Sort order
+      <input name="display_order" type="number" value="{{ status_value.display_order if status_value else 0 }}">
+    </label>
+  </div>
+  <p class="section-help">The summary screen controls whether applications with this status appear in Application Intake or Interview Pipeline. Lower sort order values appear earlier in dropdown lists.</p>
+</form>
+{% endblock %}

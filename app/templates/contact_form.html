@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Company contacts are people who work at the companies you are applying to.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="contact-form">Save</button>
+    <a class="button secondary" href="{{ '/contacts/' ~ contact.id if contact else '/contacts' }}">Cancel</a>
+  </div>
+</section>
+
+{% if not companies %}
+  <section class="empty-state">
+    <h2>Add a company first</h2>
+    <p>Company contacts must be linked to one of your target companies.</p>
+    <a class="button" href="/companies/new">Add company</a>
+  </section>
+{% else %}
+<form id="contact-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid two">
+    <label>Company
+      <select name="company_id" required>
+        <option value="">Choose company</option>
+        {% for company in companies %}
+          <option value="{{ company.id }}" {% if contact and contact.company_id == company.id %}selected{% endif %}>{{ company.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Name
+      <input name="name" required value="{{ contact.name if contact else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Position
+      <input name="position" value="{{ contact.position if contact and contact.position else '' }}">
+    </label>
+    <label>LinkedIn URL
+      <input name="linkedin_url" type="url" placeholder="https://www.linkedin.com/in/..." value="{{ contact.linkedin_url if contact and contact.linkedin_url else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Email
+      <input name="email" type="email" value="{{ contact.email if contact and contact.email else '' }}">
+    </label>
+    <label>Phone
+      <input name="phone" type="tel" value="{{ contact.phone if contact and contact.phone else '' }}">
+    </label>
+  </div>
+
+  <label>Notes
+    <textarea name="notes" rows="5">{{ contact.notes if contact and contact.notes else '' }}</textarea>
+  </label>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+Job Tracker has been installed.
+
+Check status:
+  kubectl get all -n {{ .Release.Namespace }}
+
+Port-forward locally:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "job-tracker.fullname" . }}-app 8000:80
+
+Open:
+  http://localhost:8000
+
+Ingress host configured:
+  http://{{ .Values.ingress.host }}

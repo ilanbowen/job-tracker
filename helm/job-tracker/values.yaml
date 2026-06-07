@@ -1,0 +1,43 @@
+namespaceOverride: ""
+
+image:
+  repository: job-tracker-app
+  tag: local
+  pullPolicy: IfNotPresent
+
+app:
+  name: Job Tracker
+  env: local
+  replicas: 1
+  port: 8000
+  storage:
+    size: 1Gi
+  logoDir: /app/data/logos
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: traefik
+  host: jobtracker.local
+  path: /
+
+postgres:
+  image: postgres:16-alpine
+  database: jobtracker
+  user: jobtracker
+  password: change-me-local-only
+  port: 5432
+  storage:
+    size: 1Gi
+
+backup:
+  enabled: true
+  schedule: "0 7 * * *"
+  storage:
+    size: 1Gi
+
+migrationJob:
+  enabled: false

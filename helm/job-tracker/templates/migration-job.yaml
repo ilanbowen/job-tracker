@@ -1,0 +1,32 @@
+{{- if .Values.migrationJob.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-migration
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migration
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        {{- include "job-tracker.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migration
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migration
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "job-tracker.fullname" . }}-config
+            - secretRef:
+                name: {{ include "job-tracker.fullname" . }}-secret
+          command:
+            - sh
+            - -c
+            - alembic upgrade head
+{{- end }}

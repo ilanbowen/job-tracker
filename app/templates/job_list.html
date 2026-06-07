@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block main_class %}container pipeline-container{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>{{ page_description }}</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/maintenance">Maintenance</a>
+    <a class="button" href="/applications/new">Add position</a>
+  </div>
+</section>
+
+<nav class="pipeline-view-tabs" aria-label="Application summary views">
+  {% for stage_key, stage_label in stage_links %}
+    <a class="pipeline-view-tab {% if pipeline_stage == stage_key %}active{% endif %}" href="{{ '/applications/interviews' if stage_key == 'interview' else '/applications/intake' }}">{{ stage_label }}</a>
+  {% endfor %}
+</nav>
+
+<form method="get" action="{{ list_action }}" class="filters pipeline-toolbar" id="pipeline-control-form">
+  {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+  {% if direction %}<input type="hidden" name="direction" value="{{ direction }}">{% endif %}
+
+  <div class="pipeline-search-area">
+    <label class="search-field">Search
+      <input name="q" placeholder="Search company, position, location, source, notes..." value="{{ q }}">
+    </label>
+    <div class="filter-actions compact-filter-actions">
+      <button type="submit">Search</button>
+      <a class="button secondary" href="{{ clear_url }}">Clear</a>
+    </div>
+  </div>
+
+  <div class="pipeline-filter-strip" aria-label="Pipeline filters">
+    <label class="filter-field compact-filter-field"><span>Status</span>
+      <select name="status" onchange="this.form.submit()">
+        <option value="">All statuses</option>
+        {% for option in status_options %}
+          <option value="{{ option }}" {% if selected_status == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field compact-filter-field"><span>Position</span>
+      <select name="position" onchange="this.form.submit()">
+        <option value="">All positions</option>
+        {% for option in position_options %}
+          <option value="{{ option }}" {% if selected_position == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field compact-filter-field"><span>Source</span>
+      <select name="source" onchange="this.form.submit()">
+        <option value="">All sources</option>
+        {% for option in source_options %}
+          <option value="{{ option }}" {% if selected_source == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field compact-filter-field"><span>Remote</span>
+      <select name="remote_policy" onchange="this.form.submit()">
+        <option value="">All policies</option>
+        {% for option in remote_policy_options %}
+          <option value="{{ option }}" {% if selected_remote_policy == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field compact-filter-field"><span>Location</span>
+      <select name="location" onchange="this.form.submit()">
+        <option value="">All locations</option>
+        {% for option in location_options %}
+          <option value="{{ option }}" {% if selected_location == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+</form>
+
+{% if applications %}
+  <section class="table-card pipeline-table-card">
+    <table class="application-summary-table">
+      <thead>
+        <tr>
+          <th class="summary-col-company"><a class="sort-link {% if sort == 'company' %}active{% endif %}" href="{{ sort_urls.company }}">Company <span class="sort-indicator">{% if sort == 'company' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-position"><a class="sort-link {% if sort == 'position' %}active{% endif %}" href="{{ sort_urls.position }}">Position <span class="sort-indicator">{% if sort == 'position' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-status"><a class="sort-link {% if sort == 'status' %}active{% endif %}" href="{{ sort_urls.status }}">Status <span class="sort-indicator">{% if sort == 'status' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-source"><a class="sort-link {% if sort == 'source' %}active{% endif %}" href="{{ sort_urls.source }}">Source <span class="sort-indicator">{% if sort == 'source' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-remote"><a class="sort-link {% if sort == 'remote_policy' %}active{% endif %}" href="{{ sort_urls.remote_policy }}">Remote <span class="sort-indicator">{% if sort == 'remote_policy' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-date"><a class="sort-link {% if sort == 'applied' %}active{% endif %}" href="{{ sort_urls.applied }}">Applied <span class="sort-indicator">{% if sort == 'applied' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-date"><a class="sort-link {% if sort == 'next_action' %}active{% endif %}" href="{{ sort_urls.next_action }}">Next Action <span class="sort-indicator">{% if sort == 'next_action' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-location"><a class="sort-link {% if sort == 'location' %}active{% endif %}" href="{{ sort_urls.location }}">Location <span class="sort-indicator">{% if sort == 'location' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for application in applications %}
+          <tr onclick="window.location='/applications/{{ application.id }}'">
+            <td class="summary-col-company">
+              <div class="company-cell">
+                {% if application.display_company_logo_filename %}
+                  <img class="company-logo summary-logo" src="/logos/{{ application.display_company_logo_filename }}" alt="{{ application.display_company_name }} logo">
+                {% else %}
+                  <span class="company-logo summary-logo logo-placeholder">{{ application.display_company_name[:1] }}</span>
+                {% endif %}
+                <strong>{{ application.display_company_name }}</strong>
+              </div>
+            </td>
+            <td class="summary-col-position">{{ application.position_title }}</td>
+            <td class="status-cell summary-col-status"><span class="pill summary-pill">{{ application.status }}</span></td>
+            <td class="summary-col-source">{{ application.source or '-' }}</td>
+            <td class="summary-col-remote">{{ application.remote_policy or '-' }}</td>
+            <td class="summary-col-date">{{ application.date_applied|date_month_day }}</td>
+            <td class="summary-col-date">{{ application.next_action_date|date_month_day }}</td>
+            <td class="summary-col-location">{{ application.display_location or '-' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No applications found</h2>
+    <p>Add your first position or adjust the filters for this summary screen.</p>
+    <a class="button" href="/applications/new">Add position</a>
+  </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Choose an existing company and link any relevant contacts to this position.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="application-form">Save</button>
+    <a class="button secondary" href="{{ '/applications/' ~ application.id if application else '/' }}">Cancel</a>
+  </div>
+</section>
+
+{% if not companies %}
+  <section class="empty-state">
+    <h2>Add a company first</h2>
+    <p>Positions are now linked to companies. Create a company, then add the position.</p>
+    <a class="button" href="/companies/new">Add company</a>
+  </section>
+{% else %}
+<form id="application-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid two">
+    <label>Company
+      <select name="company_id" required>
+        <option value="">Choose company</option>
+        {% for company in companies %}
+          <option value="{{ company.id }}" {% if application and application.company_id == company.id %}selected{% endif %}>{{ company.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Position title
+      <input name="position_title" required value="{{ application.position_title if application else '' }}">
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Status
+      <select name="status">
+        {% for option in status_options %}
+          <option value="{{ option }}" {% if application and application.status == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Remote policy
+      <select name="remote_policy">
+        <option value="">Not set</option>
+        {% for option in remote_policy_options %}
+          <option value="{{ option }}" {% if application and application.remote_policy == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <div class="grid two">
+    <label>Location
+      <input name="location" value="{{ application.location if application and application.location else '' }}">
+    </label>
+    <label>Source
+      <input name="source" placeholder="LinkedIn, recruiter, company site..." value="{{ application.source if application and application.source else '' }}">
+    </label>
+  </div>
+
+  <label>Job URL
+    <input name="job_url" type="url" value="{{ application.job_url if application and application.job_url else '' }}">
+  </label>
+
+  <div class="grid two">
+    <label>Date applied
+      <input name="date_applied" type="date" value="{{ application.date_applied if application and application.date_applied else (today if not application else '') }}">
+    </label>
+    <label>Next action date
+      <input name="next_action_date" type="date" value="{{ application.next_action_date if application and application.next_action_date else '' }}">
+    </label>
+  </div>
+
+  <section class="form-section">
+    <div class="section-title-row">
+      <div>
+        <h2>Linked contacts</h2>
+        <p class="section-help">Select contacts that are relevant to this specific position. Contacts are created and maintained separately.</p>
+      </div>
+      <a class="button secondary" href="/contacts/new">Add company contact</a>
+    </div>
+    {% if contacts %}
+      <label>Contacts
+        <select name="contact_ids" multiple size="8" class="multi-select">
+          {% for contact in contacts %}
+            <option value="{{ contact.id }}" {% if contact.id in selected_contact_ids %}selected{% endif %}>
+              {{ contact.company.name ~ ' — ' if contact.company else '' }}{{ contact.name }}{% if contact.position %} ({{ contact.position }}){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+      <p class="section-help">Hold Ctrl while clicking to select or clear multiple contacts.</p>
+    {% else %}
+      <p>No company contacts exist yet. Add contacts from the Company Contacts page, then return here.</p>
+    {% endif %}
+  </section>
+
+  <div class="grid two">
+    <label>Salary range
+      <input name="salary_range" value="{{ application.salary_range if application and application.salary_range else '' }}">
+    </label>
+  </div>
+
+  <label>Description
+    <textarea name="description" rows="7">{{ application.description if application and application.description else '' }}</textarea>
+  </label>
+
+  <label>Notes
+    <textarea name="notes" rows="5">{{ application.notes if application and application.notes else '' }}</textarea>
+  </label>
+</form>
+{% endif %}
+{% endblock %}

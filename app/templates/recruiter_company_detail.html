@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-heading company-detail-heading">
+  <div class="detail-title-block">
+    <div class="company-title-row">
+      {% if recruiter_company.logo_filename %}
+        <img class="company-logo detail-logo" src="/logos/{{ recruiter_company.logo_filename }}" alt="{{ recruiter_company.name }} logo">
+      {% else %}
+        <span class="company-logo detail-logo logo-placeholder">{{ recruiter_company.name[:1] }}</span>
+      {% endif %}
+      <div>
+        <h1 class="detail-company-title">{{ recruiter_company.name }}</h1>
+        <p class="detail-position-subtitle">Recruiter company</p>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/recruiter-companies">Back</a>
+    <a class="button secondary" href="/recruiter-companies/{{ recruiter_company.id }}/edit">Edit</a>
+    <form method="post" action="/recruiter-companies/{{ recruiter_company.id }}/delete" onsubmit="return confirm('Delete this recruiter company?');">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <div class="card">
+    <h2>Recruiter company details</h2>
+    <table class="detail-table summary-table">
+      <colgroup><col class="detail-label-col"><col class="detail-value-col"></colgroup>
+      <tbody>
+        <tr><th scope="row">Website</th><td class="url-cell">{% if recruiter_company.website %}<a class="url-link" href="{{ recruiter_company.website }}" target="_blank" rel="noopener" title="{{ recruiter_company.website }}">{{ recruiter_company.website }}</a>{% else %}-{% endif %}</td></tr>
+        <tr><th scope="row">LinkedIn</th><td class="url-cell">{% if recruiter_company.linkedin_url %}<a class="url-link" href="{{ recruiter_company.linkedin_url }}" target="_blank" rel="noopener" title="{{ recruiter_company.linkedin_url }}">{{ recruiter_company.linkedin_url }}</a>{% else %}-{% endif %}</td></tr>
+        <tr><th scope="row">Logo</th><td>{{ recruiter_company.logo_filename or '-' }}</td></tr>
+        <tr><th scope="row">Recruiter contacts</th><td>{{ recruiter_company.contacts|length }}</td></tr>
+        <tr><th scope="row">Date added</th><td>{{ recruiter_company.created_at|datetime_short }}</td></tr>
+        <tr><th scope="row">Last modified</th><td>{{ recruiter_company.updated_at|datetime_short }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Contacts</h2>
+    {% if recruiter_company.contacts %}
+      <ul class="record-list">
+        {% for contact in recruiter_company.contacts %}
+          <li><a href="/recruiter-contacts/{{ contact.id }}">{{ contact.name }}</a>{% if contact.position %} — {{ contact.position }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No recruiter contacts linked yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card">
+  <h2>Notes</h2>
+  <p class="prewrap">{{ recruiter_company.notes or 'No notes saved.' }}</p>
+</section>
+{% endblock %}

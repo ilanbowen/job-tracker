@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Recruiter Companies</h1>
+    <p>Maintain recruiting agencies and search firms separately from target companies.</p>
+  </div>
+  <div class="actions">
+    <a class="button" href="/recruiter-companies/new">Add recruiter company</a>
+  </div>
+</section>
+
+{% if recruiter_companies %}
+  <section class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Recruiter Company</th>
+          <th>Website</th>
+          <th>LinkedIn</th>
+          <th>Recruiter Contacts</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for recruiter_company in recruiter_companies %}
+          <tr>
+            <td>
+              <a class="record-link" href="/recruiter-companies/{{ recruiter_company.id }}">
+                <span class="company-cell inline-company-cell">
+                  {% if recruiter_company.logo_filename %}
+                    <img class="company-logo summary-logo" src="/logos/{{ recruiter_company.logo_filename }}" alt="{{ recruiter_company.name }} logo">
+                  {% else %}
+                    <span class="company-logo summary-logo logo-placeholder">{{ recruiter_company.name[:1] }}</span>
+                  {% endif %}
+                  <strong>{{ recruiter_company.name }}</strong>
+                </span>
+              </a>
+            </td>
+            <td class="url-cell">{% if recruiter_company.website %}<a class="url-link" href="{{ recruiter_company.website }}" target="_blank" rel="noopener" title="{{ recruiter_company.website }}">{{ recruiter_company.website }}</a>{% else %}-{% endif %}</td>
+            <td>{% if recruiter_company.linkedin_url %}<a href="{{ recruiter_company.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>{% else %}-{% endif %}</td>
+            <td>{{ recruiter_company.contacts|length }}</td>
+            <td>
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/recruiter-companies/{{ recruiter_company.id }}/edit">Edit</a>
+                <form method="post" action="/recruiter-companies/{{ recruiter_company.id }}/delete" onsubmit="return confirm('Delete this recruiter company?');">
+                  <button type="submit" class="danger small-button">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No recruiter companies yet</h2>
+    <p>Add recruiting agencies or search firms here, then add recruiter contacts under them.</p>
+    <a class="button" href="/recruiter-companies/new">Add recruiter company</a>
+  </section>
+{% endif %}
+{% endblock %}

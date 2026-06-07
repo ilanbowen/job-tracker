@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Company Contacts</h1>
+    <p>Maintain people who work at the companies you are applying to, then link them to opportunities.</p>
+  </div>
+  <div class="actions">
+    <a class="button" href="/contacts/new">Add company contact</a>
+  </div>
+</section>
+
+{% if contacts %}
+  <section class="table-card">
+    <table class="contacts-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>LinkedIn</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in contacts %}
+          <tr>
+            <td>
+              {% if contact.company %}
+                <a class="record-link" href="/companies/{{ contact.company.id }}">
+                  <span class="company-cell inline-company-cell">
+                    {% if contact.company.logo_filename %}
+                      <img class="company-logo summary-logo" src="/logos/{{ contact.company.logo_filename }}" alt="{{ contact.company.name }} logo">
+                    {% else %}
+                      <span class="company-logo summary-logo logo-placeholder">{{ contact.company.name[:1] }}</span>
+                    {% endif %}
+                    <strong>{{ contact.company.name }}</strong>
+                  </span>
+                </a>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td><a class="record-link" href="/contacts/{{ contact.id }}"><strong>{{ contact.name }}</strong></a></td>
+            <td>{{ contact.position or '-' }}</td>
+            <td>{{ contact.email or '-' }}</td>
+            <td>{{ contact.phone or '-' }}</td>
+            <td>{% if contact.linkedin_url %}<a href="{{ contact.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>{% else %}-{% endif %}</td>
+            <td>
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/contacts/{{ contact.id }}/edit">Edit</a>
+                <form method="post" action="/contacts/{{ contact.id }}/delete" onsubmit="return confirm('Delete this company contact?');">
+                  <button type="submit" class="danger small-button">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No company contacts yet</h2>
+    <p>Add HR people, hiring managers, technical interviewers, and other people at target companies.</p>
+    <a class="button" href="/contacts/new">Add company contact</a>
+  </section>
+{% endif %}
+{% endblock %}

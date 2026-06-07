@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or 'Job Tracker' }}</title>
+  <link rel="stylesheet" href="/static/style.css?v=summary-font-bump-3">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <a class="brand" href="/applications/interviews">Job Tracker</a>
+    </div>
+    <nav class="topnav" aria-label="Primary navigation">
+      <a href="/applications/intake">Application Intake</a>
+      <a href="/applications/interviews">Interview Pipeline</a>
+      <a href="/maintenance">Maintenance</a>
+    </nav>
+  </header>
+
+  <main class="{% block main_class %}container{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

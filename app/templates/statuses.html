@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Job Application Statuses</h1>
+    <p>Manage the status values available on job application forms and filters.</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/maintenance">Back to maintenance</a>
+    <a class="button" href="/maintenance/statuses/new">Add status</a>
+  </div>
+</section>
+
+{% if statuses %}
+  <section class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Summary screen</th>
+          <th>Sort order</th>
+          <th>Applications</th>
+          <th>Last modified</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for status in statuses %}
+          <tr class="management-row">
+            <td><strong>{{ status.name }}</strong></td>
+            <td>{{ pipeline_stage_labels.get(status.pipeline_stage, status.pipeline_stage) }}</td>
+            <td>{{ status.display_order }}</td>
+            <td>{{ application_counts.get(status.name, 0) }}</td>
+            <td>{{ status.updated_at|datetime_short }}</td>
+            <td>
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/maintenance/statuses/{{ status.id }}/edit">Edit</a>
+                <form method="post" action="/maintenance/statuses/{{ status.id }}/delete" onsubmit="return confirm('Delete this status?');">
+                  <button type="submit" class="danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No statuses yet</h2>
+    <p>Add your first status value.</p>
+    <a class="button" href="/maintenance/statuses/new">Add status</a>
+  </section>
+{% endif %}
+{% endblock %}
