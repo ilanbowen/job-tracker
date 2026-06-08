@@ -1,5 +1,7 @@
-<img width="1903" height="528" alt="Job-Tracker-Screenshot" src="https://github.com/user-attachments/assets/bd694eba-0d7b-469a-9b0c-dd3e80793ee0" />
 # Job Tracker
+
+<img width="1903" height="528" alt="Job-Tracker-Screenshot" src="https://github.com/user-attachments/assets/bd694eba-0d7b-469a-9b0c-dd3e80793ee0" />
+
 
 A local-first job application tracker designed to run inside a Kubernetes cluster on WSL2.
 
