@@ -1941,3 +1941,293 @@ code {
   height: 1.15rem !important;
   min-width: 1.15rem !important;
 }
+
+/* Position category summary update: add Category column, keep no horizontal scroll, and enlarge summary actions. */
+.pipeline-container .summary-actions .button,
+.pipeline-container .summary-actions button {
+  font-size: 0.95rem !important;
+  padding: 0.68rem 1.02rem !important;
+  border-radius: 0.58rem !important;
+}
+
+.pipeline-container .pipeline-filter-strip {
+  grid-template-columns: repeat(6, minmax(96px, 1fr)) !important;
+}
+
+.pipeline-container .application-summary-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-company {
+  width: 13% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-position {
+  width: 18% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-category {
+  width: 8% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-status {
+  width: 13% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-source {
+  width: 9% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-remote {
+  width: 7% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-date {
+  width: 6% !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-location {
+  width: 20% !important;
+}
+
+/* Job application detail refinements: wider canvas, compact rows, editable timeline. */
+.application-detail-container {
+  max-width: none !important;
+  width: min(1760px, calc(100vw - 1.5rem));
+  padding: 1rem 0.75rem 2rem;
+}
+
+.application-detail-container .card {
+  padding: 1rem;
+}
+
+.application-detail-container .detail-heading {
+  margin-bottom: 1rem;
+}
+
+.application-detail-wide-grid {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) !important;
+  gap: 1rem;
+}
+
+.application-detail-info-grid {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
+  gap: 1rem;
+}
+
+.application-detail-container .compact-detail-table th,
+.application-detail-container .compact-detail-table td,
+.application-detail-container .contacts-table th,
+.application-detail-container .contacts-table td,
+.application-detail-container .timeline-table th,
+.application-detail-container .timeline-table td {
+  padding: 0.48rem 0.65rem;
+  vertical-align: top;
+}
+
+.application-detail-container .summary-table .detail-label-col {
+  width: 20%;
+}
+
+.application-detail-container .summary-table .detail-value-col {
+  width: 80%;
+}
+
+.application-detail-container .url-cell,
+.application-detail-container .url-link {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-detail-container .application-contacts-table {
+  table-layout: fixed;
+}
+
+.application-detail-container .application-contacts-table th:nth-child(1) { width: 28%; }
+.application-detail-container .application-contacts-table th:nth-child(2) { width: 30%; }
+.application-detail-container .application-contacts-table th:nth-child(3) { width: 20%; }
+.application-detail-container .application-contacts-table th:nth-child(4) { width: 22%; }
+
+.application-detail-container .application-contacts-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.application-timeline-table {
+  table-layout: fixed;
+}
+
+.application-timeline-table .timeline-date-col {
+  width: 8rem;
+}
+
+.application-timeline-table .timeline-actions-col {
+  width: 5.75rem;
+}
+
+.timeline-actions-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.small-button {
+  font-size: 0.78rem;
+  padding: 0.38rem 0.55rem;
+  border-radius: 0.45rem;
+}
+
+@media (max-width: 1100px) {
+  .application-detail-wide-grid,
+  .application-detail-info-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .application-detail-container {
+    width: calc(100vw - 0.75rem);
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+  }
+}
+
+
+/* Application summary font bump 3: noticeably larger text with category-aware balanced columns and no horizontal scroll. */
+.pipeline-container .table-wrap {
+  overflow-x: hidden !important;
+}
+
+.pipeline-container .application-summary-table {
+  font-size: 1.08rem !important;
+  table-layout: fixed !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.pipeline-container .application-summary-table th,
+.pipeline-container .application-summary-table td {
+  font-size: 1.08rem !important;
+  padding-top: 0.40rem !important;
+  padding-bottom: 0.40rem !important;
+  padding-left: 0.42rem !important;
+  padding-right: 0.42rem !important;
+  line-height: 1.18 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.pipeline-container .application-summary-table th {
+  font-size: 0.80rem !important;
+}
+
+.pipeline-container .application-summary-table .summary-col-company { width: 13% !important; }
+.pipeline-container .application-summary-table .summary-col-position { width: 18% !important; }
+.pipeline-container .application-summary-table .summary-col-category { width: 8% !important; }
+.pipeline-container .application-summary-table .summary-col-status { width: 13.5% !important; }
+.pipeline-container .application-summary-table .summary-col-source { width: 10% !important; }
+.pipeline-container .application-summary-table .summary-col-remote { width: 7% !important; }
+.pipeline-container .application-summary-table .summary-col-date { width: 6% !important; }
+.pipeline-container .application-summary-table .summary-col-location { width: 18.5% !important; }
+
+.pipeline-container .application-summary-table td.summary-col-status,
+.pipeline-container .application-summary-table th.summary-col-status {
+  padding-right: 0.85rem !important;
+}
+
+.pipeline-container .application-summary-table td.summary-col-source,
+.pipeline-container .application-summary-table th.summary-col-source {
+  padding-left: 0.70rem !important;
+}
+
+.pipeline-container .application-summary-table .company-logo,
+.pipeline-container .application-summary-table .logo-placeholder {
+  width: 1.15rem !important;
+  height: 1.15rem !important;
+  min-width: 1.15rem !important;
+}
+
+/* LinkedIn lookup controls */
+.form-field.linkedin-lookup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.linkedin-lookup-actions {
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
+}
+
+.linkedin-lookup-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.linkedin-result-item {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 0.75rem;
+  background: var(--surface-muted, #f8fafc);
+}
+
+.linkedin-result-details {
+  min-width: 0;
+}
+
+.linkedin-result-title {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkedin-result-url {
+  color: var(--link, #2563eb);
+  font-size: 0.86rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkedin-result-snippet {
+  color: var(--muted, #64748b);
+  display: -webkit-box;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.button.small,
+button.small {
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  padding: 0.42rem 0.7rem;
+}
+
+.small-text {
+  font-size: 0.83rem;
+}
+
+.muted {
+  color: var(--muted, #64748b);
+}
+
+.inline-actions {
+  display: flex;
+}

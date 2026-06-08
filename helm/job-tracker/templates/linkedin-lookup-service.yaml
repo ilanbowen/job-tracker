@@ -1,0 +1,19 @@
+{{- if .Values.linkedinLookup.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-linkedin-lookup
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: linkedin-lookup
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: {{ .Values.linkedinLookup.service.port }}
+      targetPort: http
+  selector:
+    {{- include "job-tracker.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: linkedin-lookup
+{{- end }}

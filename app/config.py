@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     logo_dir: str = "data/logos"
     # Optional fallback directory for logos bundled with the source tree/image.
     seed_logo_dir: str = "logos"
+    # Internal service URL for LinkedIn company lookup. In Kubernetes this is
+    # set to the linkedin-lookup Service by the Helm ConfigMap.
+    linkedin_lookup_url: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

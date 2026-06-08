@@ -16,6 +16,18 @@ class ApplicationContact(Base):
     role: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
 
+class ApplicationRecruiterContact(Base):
+    __tablename__ = "application_recruiter_contacts"
+
+    job_application_id: Mapped[int] = mapped_column(
+        ForeignKey("job_applications.id", ondelete="CASCADE"), primary_key=True
+    )
+    recruiter_contact_id: Mapped[int] = mapped_column(
+        ForeignKey("recruiter_contacts.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+
 class Company(Base):
     __tablename__ = "companies"
 
@@ -103,6 +115,9 @@ class RecruiterContact(Base):
     )
 
     recruiter_company: Mapped[RecruiterCompany | None] = relationship(back_populates="contacts")
+    applications: Mapped[list["JobApplication"]] = relationship(
+        secondary="application_recruiter_contacts", back_populates="recruiter_contacts"
+    )
 
 
 class JobStatus(Base):
@@ -118,6 +133,33 @@ class JobStatus(Base):
     )
 
 
+
+class JobSource(Base):
+    __tablename__ = "job_sources"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, unique=True, index=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+
+class PositionCategory(Base):
+    __tablename__ = "position_categories"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(80), nullable=False, unique=True, index=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    applications: Mapped[list["JobApplication"]] = relationship(back_populates="category")
+
+
 class JobApplication(Base):
     __tablename__ = "job_applications"
 
@@ -131,6 +173,7 @@ class JobApplication(Base):
     company_logo_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     position_title: Mapped[str] = mapped_column(String(250), nullable=False, index=True)
+    category_id: Mapped[int | None] = mapped_column(ForeignKey("position_categories.id", ondelete="SET NULL"), nullable=True, index=True)
     location: Mapped[str | None] = mapped_column(String(200), nullable=True)
     remote_policy: Mapped[str | None] = mapped_column(String(80), nullable=True)
     job_url: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -170,8 +213,14 @@ class JobApplication(Base):
     )
 
     company: Mapped[Company | None] = relationship(back_populates="applications")
+    category: Mapped[PositionCategory | None] = relationship(back_populates="applications")
     contacts: Mapped[list[Contact]] = relationship(
         secondary="application_contacts", back_populates="applications", order_by="Contact.name"
+    )
+    recruiter_contacts: Mapped[list[RecruiterContact]] = relationship(
+        secondary="application_recruiter_contacts",
+        back_populates="applications",
+        order_by="RecruiterContact.name",
     )
     events: Mapped[list["ApplicationEvent"]] = relationship(
         back_populates="application", cascade="all, delete-orphan", order_by="desc(ApplicationEvent.event_date)"
@@ -194,10 +243,26 @@ class JobApplication(Base):
         return self.company.logo_filename if self.company else self.company_logo_filename
 
     @property
+    def display_category_name(self) -> str | None:
+        return self.category.name if self.category else None
+
+    @property
     def display_location(self) -> str | None:
         if self.company and self.company.city:
             return self.company.city
         return self.location
+
+
+class ApplicationEventType(Base):
+    __tablename__ = "application_event_types"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
 
 
 class ApplicationEvent(Base):

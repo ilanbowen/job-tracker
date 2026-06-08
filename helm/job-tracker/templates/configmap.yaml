@@ -10,3 +10,8 @@ data:
   APP_ENV: {{ .Values.app.env | quote }}
   LOGO_DIR: {{ .Values.app.logoDir | quote }}
   SEED_LOGO_DIR: "logos"
+  {{ if .Values.linkedinLookup.enabled }}
+  LINKEDIN_LOOKUP_URL: {{ printf "http://%s-linkedin-lookup:%v" (include "job-tracker.fullname" .) .Values.linkedinLookup.service.port | quote }}
+  {{ else }}
+  LINKEDIN_LOOKUP_URL: ""
+  {{ end }}

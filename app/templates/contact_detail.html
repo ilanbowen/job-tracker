@@ -39,7 +39,11 @@
           <th scope="row">Phone</th>
           <td>
             <div class="contact-methods-inline">
-              <span class="contact-phone-value">{{ contact.phone or '-' }}</span>
+              {% if contact.phone %}
+                <a class="contact-phone-value phone-link" href="{{ contact.phone|whatsapp_url }}" target="_blank" rel="noopener">{{ contact.phone }}</a>
+              {% else %}
+                <span class="contact-phone-value">-</span>
+              {% endif %}
               {% if contact.linkedin_url %}
                 <a class="contact-linkedin-action" href="{{ contact.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>
               {% endif %}

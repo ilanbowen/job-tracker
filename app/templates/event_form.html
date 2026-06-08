@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Edit the timeline entry for this job application.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="event-form">Save</button>
+    <a class="button secondary" href="{{ back_url }}">Cancel</a>
+  </div>
+</section>
+
+<form id="event-form" method="post" action="{{ form_action }}" class="form-card">
+  <input type="hidden" name="return_to" value="{{ return_to }}">
+  <div class="grid two">
+    <label>Event type
+      <select name="event_type">
+        {% for option in event_type_options %}
+          <option value="{{ option }}" {% if event.event_type == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Event date
+      <input name="event_date" type="date" value="{{ event.event_date.isoformat() if event.event_date else '' }}">
+    </label>
+  </div>
+  <label>Note
+    <textarea name="note" rows="7" required>{{ event.note }}</textarea>
+  </label>
+</form>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Timeline Event Types</h1>
+    <p>Manage the event types available when adding or editing timeline entries on job applications.</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/maintenance">Back to maintenance</a>
+    <a class="button" href="/maintenance/event-types/new">Add event type</a>
+  </div>
+</section>
+
+{% if event_types %}
+<section class="table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Sort Order</th>
+        <th>Timeline Entries</th>
+        <th>Last Modified</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event_type in event_types %}
+        <tr>
+          <td><strong>{{ event_type.name }}</strong></td>
+          <td>{{ event_type.display_order }}</td>
+          <td>{{ event_counts.get(event_type.name, 0) }}</td>
+          <td>{{ event_type.updated_at|datetime_short }}</td>
+          <td>
+            <div class="actions">
+              <a class="button secondary" href="/maintenance/event-types/{{ event_type.id }}/edit">Edit</a>
+              <form method="post" action="/maintenance/event-types/{{ event_type.id }}/delete" onsubmit="return confirm('Delete this event type?');">
+                <button type="submit" class="danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<section class="empty-state">
+  <h2>No timeline event types yet</h2>
+  <p>Add event types such as Note, Follow-up, Interview, Rejected, or Offer.</p>
+  <a class="button" href="/maintenance/event-types/new">Add event type</a>
+</section>
+{% endif %}
+{% endblock %}

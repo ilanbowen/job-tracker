@@ -1,0 +1,51 @@
+{{- if .Values.linkedinLookup.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "job-tracker.fullname" . }}-linkedin-lookup
+  namespace: {{ include "job-tracker.namespace" . }}
+  labels:
+    {{- include "job-tracker.labels" . | nindent 4 }}
+    app.kubernetes.io/component: linkedin-lookup
+spec:
+  replicas: {{ .Values.linkedinLookup.replicas }}
+  selector:
+    matchLabels:
+      {{- include "job-tracker.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: linkedin-lookup
+  template:
+    metadata:
+      labels:
+        {{- include "job-tracker.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: linkedin-lookup
+    spec:
+      containers:
+        - name: linkedin-lookup
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.linkedinLookup.port }}
+          envFrom:
+            - secretRef:
+                name: {{ include "job-tracker.fullname" . }}-secret
+          command:
+            - uvicorn
+            - linkedin_lookup.main:app
+            - --host
+            - 0.0.0.0
+            - --port
+            - {{ .Values.linkedinLookup.port | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+{{- end }}

@@ -40,7 +40,8 @@ Initial tables:
 
 - `companies` — reusable company records, including website, LinkedIn page, address, city, and logo filename
 - `contacts` — reusable people/contact records linked to companies
-- `job_applications` — current state of each job opportunity, linked to one company
+- `job_applications` — current state of each job opportunity, linked to one company and optionally one position category
+- `position_categories` — managed category values such as Devops and IT
 - `application_contacts` — links contacts to specific job applications
 - `application_events` — timeline/history events for each opportunity
 
@@ -196,16 +197,17 @@ You can later add a restore script and export feature.
 - Add/edit/delete reusable companies with city/address fields
 - View company, company contact, recruiter company, and recruiter contact detail pages
 - Add/edit/delete reusable company contacts
-- Add a job application linked to a company
+- Add a job application linked to a company and category
 - Link existing contacts to a job application
 - View all applications in a summary table
-- Filter and sort the summary table
+- Filter and sort the summary tables, including by category
 - Search company, role, location, source, and notes
 - View application detail with company logo and linked contacts
 - Edit application
 - Delete application
 - Add timeline/history events
 - Track status changes as events
+- Manage job application statuses and position categories from Maintenance
 
 ## Suggested next milestones
 
@@ -251,3 +253,51 @@ The app now separates company-side contacts from recruiter-side contacts:
 - `/recruiter-contacts` manages recruiter contacts. `date_added` is automatic and `date_contact_made` is optional/manual.
 
 Recruiter contacts are intentionally not linked to position detail pages yet.
+
+
+### Application summary screens
+
+The app includes Application Intake, Interview Pipeline, and Archive summary screens. Status values can be assigned to one of these screens from Maintenance → Job Application Statuses.
+
+## LinkedIn company lookup service
+
+The Company add/edit form can look up likely LinkedIn company pages using a separate internal FastAPI service:
+
+```text
+Job Tracker app  --->  linkedin-lookup Service  --->  Tavily API
+```
+
+The lookup service is deployed as its own Kubernetes Deployment and Service by the Helm chart. The main app calls it through the internal service URL stored in `LINKEDIN_LOOKUP_URL`.
+
+The Tavily API key is stored in the Helm Secret as `TAVILY_API_KEY`. Do not commit a real key to Git.
+
+Deploy with the key like this:
+
+```bash
+export TAVILY_API_KEY="your-real-key"
+
+helm upgrade --install job-tracker ./helm/job-tracker \
+  --namespace job-tracker \
+  --create-namespace \
+  --set-string linkedinLookup.tavilyApiKey="$TAVILY_API_KEY"
+```
+
+After deployment, verify the lookup service:
+
+```bash
+kubectl get pods,svc -n job-tracker | grep linkedin
+kubectl logs -n job-tracker deploy/job-tracker-linkedin-lookup
+```
+
+For direct local development, run the lookup service separately:
+
+```bash
+export TAVILY_API_KEY="your-real-key"
+uvicorn linkedin_lookup.main:app --host 0.0.0.0 --port 8001
+```
+
+Then set this in `.env` for the main app:
+
+```env
+LINKEDIN_LOOKUP_URL=http://localhost:8001
+```

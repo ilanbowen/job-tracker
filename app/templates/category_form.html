@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Categories are used by job application forms, filters, and summary pages.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="category-form">Save</button>
+    <a class="button secondary" href="/maintenance/categories">Cancel</a>
+  </div>
+</section>
+
+<form id="category-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid two">
+    <label>Category name
+      <input name="name" required value="{{ category.name if category else '' }}">
+    </label>
+    <label>Sort order
+      <input name="display_order" type="number" value="{{ category.display_order if category else 0 }}">
+    </label>
+  </div>
+  <p class="section-help">Lower sort order values appear earlier in dropdown lists.</p>
+</form>
+{% endblock %}

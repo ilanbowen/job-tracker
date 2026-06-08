@@ -6,7 +6,7 @@
     <h1>{{ page_title }}</h1>
     <p>{{ page_description }}</p>
   </div>
-  <div class="actions">
+  <div class="actions summary-actions">
     <a class="button secondary" href="/maintenance">Maintenance</a>
     <a class="button" href="/applications/new">Add position</a>
   </div>
@@ -14,7 +14,7 @@
 
 <nav class="pipeline-view-tabs" aria-label="Application summary views">
   {% for stage_key, stage_label in stage_links %}
-    <a class="pipeline-view-tab {% if pipeline_stage == stage_key %}active{% endif %}" href="{{ '/applications/interviews' if stage_key == 'interview' else '/applications/intake' }}">{{ stage_label }}</a>
+    <a class="pipeline-view-tab {% if pipeline_stage == stage_key %}active{% endif %}" href="{{ stage_routes.get(stage_key, '/applications/interviews') }}">{{ stage_label }}</a>
   {% endfor %}
 </nav>
 
@@ -24,7 +24,7 @@
 
   <div class="pipeline-search-area">
     <label class="search-field">Search
-      <input name="q" placeholder="Search company, position, location, source, notes..." value="{{ q }}">
+      <input name="q" placeholder="Search company, position, category, location, source, notes..." value="{{ q }}">
     </label>
     <div class="filter-actions compact-filter-actions">
       <button type="submit">Search</button>
@@ -47,6 +47,15 @@
         <option value="">All positions</option>
         {% for option in position_options %}
           <option value="{{ option }}" {% if selected_position == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field compact-filter-field"><span>Category</span>
+      <select name="category_id" onchange="this.form.submit()">
+        <option value="">All categories</option>
+        {% for category in category_options %}
+          <option value="{{ category.id }}" {% if selected_category_id|string == category.id|string %}selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
       </select>
     </label>
@@ -87,6 +96,7 @@
         <tr>
           <th class="summary-col-company"><a class="sort-link {% if sort == 'company' %}active{% endif %}" href="{{ sort_urls.company }}">Company <span class="sort-indicator">{% if sort == 'company' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
           <th class="summary-col-position"><a class="sort-link {% if sort == 'position' %}active{% endif %}" href="{{ sort_urls.position }}">Position <span class="sort-indicator">{% if sort == 'position' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
+          <th class="summary-col-category"><a class="sort-link {% if sort == 'category' %}active{% endif %}" href="{{ sort_urls.category }}">Category <span class="sort-indicator">{% if sort == 'category' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
           <th class="summary-col-status"><a class="sort-link {% if sort == 'status' %}active{% endif %}" href="{{ sort_urls.status }}">Status <span class="sort-indicator">{% if sort == 'status' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
           <th class="summary-col-source"><a class="sort-link {% if sort == 'source' %}active{% endif %}" href="{{ sort_urls.source }}">Source <span class="sort-indicator">{% if sort == 'source' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
           <th class="summary-col-remote"><a class="sort-link {% if sort == 'remote_policy' %}active{% endif %}" href="{{ sort_urls.remote_policy }}">Remote <span class="sort-indicator">{% if sort == 'remote_policy' %}{{ '↑' if direction == 'asc' else '↓' }}{% else %}↕{% endif %}</span></a></th>
@@ -97,7 +107,7 @@
       </thead>
       <tbody>
         {% for application in applications %}
-          <tr onclick="window.location='/applications/{{ application.id }}'">
+          <tr onclick="window.location='/applications/{{ application.id }}?return_to={{ return_to|urlencode }}'">
             <td class="summary-col-company">
               <div class="company-cell">
                 {% if application.display_company_logo_filename %}
@@ -109,6 +119,7 @@
               </div>
             </td>
             <td class="summary-col-position">{{ application.position_title }}</td>
+            <td class="summary-col-category">{{ application.display_category_name or '-' }}</td>
             <td class="status-cell summary-col-status"><span class="pill summary-pill">{{ application.status }}</span></td>
             <td class="summary-col-source">{{ application.source or '-' }}</td>
             <td class="summary-col-remote">{{ application.remote_policy or '-' }}</td>

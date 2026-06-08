@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading form-page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Sources are used by job application forms, filters, and conditional recruiter sections.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="source-form">Save</button>
+    <a class="button secondary" href="/maintenance/sources">Cancel</a>
+  </div>
+</section>
+
+<form id="source-form" class="form-card" method="post" action="{{ form_action }}">
+  <div class="grid two">
+    <label>Source name
+      <input name="name" required value="{{ source_value.name if source_value else '' }}">
+    </label>
+    <label>Sort order
+      <input name="display_order" type="number" value="{{ source_value.display_order if source_value else 0 }}">
+    </label>
+  </div>
+  <p class="section-help">Lower sort order values appear earlier in dropdown lists. Keep the value <strong>External Recruiter</strong> if you want the recruiter-contact section to appear on position detail pages.</p>
+</form>
+{% endblock %}

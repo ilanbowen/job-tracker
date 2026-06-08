@@ -21,7 +21,7 @@
 <form id="application-form" class="form-card" method="post" action="{{ form_action }}">
   <div class="grid two">
     <label>Company
-      <select name="company_id" required>
+      <select name="company_id" id="application-company-select" required>
         <option value="">Choose company</option>
         {% for company in companies %}
           <option value="{{ company.id }}" {% if application and application.company_id == company.id %}selected{% endif %}>{{ company.name }}</option>
@@ -33,7 +33,15 @@
     </label>
   </div>
 
-  <div class="grid two">
+  <div class="grid three">
+    <label>Category
+      <select name="category_id">
+        <option value="0">Not set</option>
+        {% for category in category_options %}
+          <option value="{{ category.id }}" {% if application and application.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
     <label>Status
       <select name="status">
         {% for option in status_options %}
@@ -56,7 +64,12 @@
       <input name="location" value="{{ application.location if application and application.location else '' }}">
     </label>
     <label>Source
-      <input name="source" placeholder="LinkedIn, recruiter, company site..." value="{{ application.source if application and application.source else '' }}">
+      <select name="source" id="application-source-select">
+        <option value="">Not set</option>
+        {% for option in source_options %}
+          <option value="{{ option }}" {% if application and application.source == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
     </label>
   </div>
 
@@ -73,25 +86,29 @@
     </label>
   </div>
 
-  <section class="form-section">
+  <section class="form-section" id="company-contact-picker-section">
     <div class="section-title-row">
       <div>
-        <h2>Linked contacts</h2>
+        <h2>Company contacts</h2>
         <p class="section-help">Select contacts that are relevant to this specific position. Contacts are created and maintained separately.</p>
       </div>
       <a class="button secondary" href="/contacts/new">Add company contact</a>
     </div>
     {% if contacts %}
-      <label>Contacts
-        <select name="contact_ids" multiple size="8" class="multi-select">
+      <label>Contacts for selected company
+        <select name="contact_ids" id="application-contact-select" multiple size="8" class="multi-select">
           {% for contact in contacts %}
-            <option value="{{ contact.id }}" {% if contact.id in selected_contact_ids %}selected{% endif %}>
-              {{ contact.company.name ~ ' — ' if contact.company else '' }}{{ contact.name }}{% if contact.position %} ({{ contact.position }}){% endif %}
+            <option
+              value="{{ contact.id }}"
+              data-company-id="{{ contact.company_id or '' }}"
+              {% if contact.id in selected_contact_ids %}selected{% endif %}
+            >
+              {{ contact.name }}{% if contact.position %} ({{ contact.position }}){% endif %}
             </option>
           {% endfor %}
         </select>
       </label>
-      <p class="section-help">Hold Ctrl while clicking to select or clear multiple contacts.</p>
+      <p class="section-help" id="company-contact-filter-help">Choose a company above to show its existing contacts. Hold Ctrl while clicking to select or clear multiple contacts.</p>
     {% else %}
       <p>No company contacts exist yet. Add contacts from the Company Contacts page, then return here.</p>
     {% endif %}
@@ -112,4 +129,45 @@
   </label>
 </form>
 {% endif %}
+
+<script>
+(function () {
+  const companySelect = document.getElementById('application-company-select');
+  const contactSelect = document.getElementById('application-contact-select');
+  const help = document.getElementById('company-contact-filter-help');
+
+  if (!companySelect || !contactSelect) {
+    return;
+  }
+
+  function refreshCompanyContacts() {
+    const selectedCompanyId = companySelect.value || '';
+    let visibleCount = 0;
+
+    Array.from(contactSelect.options).forEach((option) => {
+      const matches = selectedCompanyId && option.dataset.companyId === selectedCompanyId;
+      option.hidden = !matches;
+      option.disabled = !matches;
+      if (!matches) {
+        option.selected = false;
+      } else {
+        visibleCount += 1;
+      }
+    });
+
+    if (help) {
+      if (!selectedCompanyId) {
+        help.textContent = 'Choose a company above to show its existing contacts.';
+      } else if (visibleCount === 0) {
+        help.textContent = 'No company contacts exist yet for the selected company. Use Add company contact to create one.';
+      } else {
+        help.textContent = `Showing ${visibleCount} contact${visibleCount === 1 ? '' : 's'} for the selected company. Hold Ctrl while clicking to select or clear multiple contacts.`;
+      }
+    }
+  }
+
+  companySelect.addEventListener('change', refreshCompanyContacts);
+  refreshCompanyContacts();
+})();
+</script>
 {% endblock %}

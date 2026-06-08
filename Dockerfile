@@ -13,6 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY linkedin_lookup ./linkedin_lookup
 COPY migrations ./migrations
 COPY logos ./logos
 COPY alembic.ini .

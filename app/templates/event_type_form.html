@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>{{ page_title }}</h1>
+    <p>Timeline event types are used in the job application timeline event dropdown.</p>
+  </div>
+  <div class="actions">
+    <button type="submit" form="event-type-form">Save</button>
+    <a class="button secondary" href="/maintenance/event-types">Cancel</a>
+  </div>
+</section>
+
+<form id="event-type-form" method="post" action="{{ form_action }}" class="form-card">
+  <div class="grid two">
+    <label>Name
+      <input name="name" required value="{{ event_type.name if event_type else '' }}" placeholder="Interview">
+    </label>
+    <label>Sort Order
+      <input name="display_order" type="number" value="{{ event_type.display_order if event_type else 0 }}">
+    </label>
+  </div>
+</form>
+{% endblock %}

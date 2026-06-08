@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Position Categories</h1>
+    <p>Manage the category values available on job application forms, filters, and summaries.</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/maintenance">Back to maintenance</a>
+    <a class="button" href="/maintenance/categories/new">Add category</a>
+  </div>
+</section>
+
+{% if categories %}
+  <section class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Sort order</th>
+          <th>Applications</th>
+          <th>Last modified</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+          <tr class="management-row">
+            <td><strong>{{ category.name }}</strong></td>
+            <td>{{ category.display_order }}</td>
+            <td>{{ application_counts.get(category.id, 0) }}</td>
+            <td>{{ category.updated_at|datetime_short }}</td>
+            <td>
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/maintenance/categories/{{ category.id }}/edit">Edit</a>
+                <form method="post" action="/maintenance/categories/{{ category.id }}/delete" onsubmit="return confirm('Delete this category?');">
+                  <button type="submit" class="danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No categories yet</h2>
+    <p>Add your first position category.</p>
+    <a class="button" href="/maintenance/categories/new">Add category</a>
+  </section>
+{% endif %}
+{% endblock %}

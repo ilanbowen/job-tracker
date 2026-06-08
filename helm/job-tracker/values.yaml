@@ -41,3 +41,13 @@ backup:
 
 migrationJob:
   enabled: false
+
+linkedinLookup:
+  enabled: true
+  replicas: 1
+  port: 8001
+  service:
+    port: 80
+  # Do not commit a real key. Set this during deploy, for example:
+  # --set-string linkedinLookup.tavilyApiKey="$TAVILY_API_KEY"
+  tavilyApiKey: ""

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <h1>Application Sources</h1>
+    <p>Manage the source values available on job application forms, filters, and summaries.</p>
+  </div>
+  <div class="actions">
+    <a class="button secondary" href="/maintenance">Back to maintenance</a>
+    <a class="button" href="/maintenance/sources/new">Add source</a>
+  </div>
+</section>
+
+{% if sources %}
+  <section class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Source</th>
+          <th>Sort order</th>
+          <th>Applications</th>
+          <th>Last modified</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for source in sources %}
+          <tr class="management-row">
+            <td><strong>{{ source.name }}</strong></td>
+            <td>{{ source.display_order }}</td>
+            <td>{{ application_counts.get(source.name, 0) }}</td>
+            <td>{{ source.updated_at|datetime_short }}</td>
+            <td>
+              <div class="actions compact-actions">
+                <a class="button secondary" href="/maintenance/sources/{{ source.id }}/edit">Edit</a>
+                <form method="post" action="/maintenance/sources/{{ source.id }}/delete" onsubmit="return confirm('Delete this source?');">
+                  <button type="submit" class="danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% else %}
+  <section class="empty-state">
+    <h2>No sources yet</h2>
+    <p>Add your first application source.</p>
+    <a class="button" href="/maintenance/sources/new">Add source</a>
+  </section>
+{% endif %}
+{% endblock %}

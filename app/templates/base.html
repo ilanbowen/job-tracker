@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title or 'Job Tracker' }}</title>
-  <link rel="stylesheet" href="/static/style.css?v=summary-font-bump-3">
+  <link rel="stylesheet" href="/static/style.css?v=linkedin-lookup-1">
 </head>
 <body>
   <header class="topbar">
@@ -14,6 +14,7 @@
     <nav class="topnav" aria-label="Primary navigation">
       <a href="/applications/intake">Application Intake</a>
       <a href="/applications/interviews">Interview Pipeline</a>
+      <a href="/applications/archive">Archive</a>
       <a href="/maintenance">Maintenance</a>
     </nav>
   </header>
@@ -21,5 +22,6 @@
   <main class="{% block main_class %}container{% endblock %}">
     {% block content %}{% endblock %}
   </main>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

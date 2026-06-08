@@ -19,9 +19,15 @@
     <label>Company website
       <input name="website" type="url" placeholder="https://example.com" value="{{ company.website if company and company.website else '' }}">
     </label>
-    <label>Company LinkedIn page
-      <input name="linkedin_url" type="url" placeholder="https://www.linkedin.com/company/..." value="{{ company.linkedin_url if company and company.linkedin_url else '' }}">
-    </label>
+    <div class="form-field linkedin-lookup-field">
+      <label for="company-linkedin-url">Company LinkedIn page</label>
+      <input id="company-linkedin-url" name="linkedin_url" type="url" placeholder="https://www.linkedin.com/company/..." value="{{ company.linkedin_url if company and company.linkedin_url else '' }}">
+      <div class="inline-actions linkedin-lookup-actions">
+        <button id="linkedin-lookup-button" class="button secondary small" type="button">Find LinkedIn page</button>
+        <span id="linkedin-lookup-status" class="muted small-text" role="status"></span>
+      </div>
+      <div id="linkedin-lookup-results" class="linkedin-lookup-results" hidden></div>
+    </div>
   </div>
 
   <div class="grid two">
@@ -52,4 +58,112 @@
     <textarea name="notes" rows="5">{{ company.notes if company and company.notes else '' }}</textarea>
   </label>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const nameInput = document.querySelector('input[name="name"]');
+  const linkedinInput = document.getElementById('company-linkedin-url');
+  const lookupButton = document.getElementById('linkedin-lookup-button');
+  const status = document.getElementById('linkedin-lookup-status');
+  const resultsBox = document.getElementById('linkedin-lookup-results');
+
+  if (!nameInput || !linkedinInput || !lookupButton || !status || !resultsBox) {
+    return;
+  }
+
+  function setStatus(message) {
+    status.textContent = message || '';
+  }
+
+  function clearResults() {
+    resultsBox.innerHTML = '';
+    resultsBox.hidden = true;
+  }
+
+  function resultTitle(result) {
+    return result.title || result.url;
+  }
+
+  lookupButton.addEventListener('click', async function () {
+    const companyName = nameInput.value.trim();
+    if (!companyName) {
+      setStatus('Enter a company name first.');
+      clearResults();
+      nameInput.focus();
+      return;
+    }
+
+    lookupButton.disabled = true;
+    clearResults();
+    setStatus('Searching...');
+
+    try {
+      const params = new URLSearchParams({ name: companyName, limit: '5' });
+      const response = await fetch(`/companies/linkedin-search?${params.toString()}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.detail || 'LinkedIn lookup failed.');
+      }
+
+      const results = payload.results || [];
+      if (!results.length) {
+        setStatus('No LinkedIn company pages found.');
+        return;
+      }
+
+      setStatus(`${results.length} result${results.length === 1 ? '' : 's'} found.`);
+      resultsBox.hidden = false;
+
+      results.forEach((result) => {
+        const item = document.createElement('div');
+        item.className = 'linkedin-result-item';
+
+        const details = document.createElement('div');
+        details.className = 'linkedin-result-details';
+
+        const title = document.createElement('div');
+        title.className = 'linkedin-result-title';
+        title.textContent = resultTitle(result);
+        details.appendChild(title);
+
+        const url = document.createElement('div');
+        url.className = 'linkedin-result-url';
+        url.textContent = result.url;
+        details.appendChild(url);
+
+        if (result.snippet) {
+          const snippet = document.createElement('div');
+          snippet.className = 'linkedin-result-snippet';
+          snippet.textContent = result.snippet;
+          details.appendChild(snippet);
+        }
+
+        const choose = document.createElement('button');
+        choose.type = 'button';
+        choose.className = 'button small';
+        choose.textContent = 'Use this';
+        choose.addEventListener('click', function () {
+          linkedinInput.value = result.url;
+          setStatus('LinkedIn page selected.');
+          clearResults();
+        });
+
+        item.appendChild(details);
+        item.appendChild(choose);
+        resultsBox.appendChild(item);
+      });
+    } catch (error) {
+      setStatus(error.message || 'LinkedIn lookup failed.');
+      clearResults();
+    } finally {
+      lookupButton.disabled = false;
+    }
+  });
+})();
+</script>
 {% endblock %}
